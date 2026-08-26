@@ -1,2 +1,2 @@
-const Resume = "Elearning";
-export default Resume;
+const Clinic = "Clinic";
+export default Clinic;
