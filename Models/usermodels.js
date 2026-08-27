@@ -37,37 +37,44 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-export const User = mongoose.model("User", userSchema);
 
-userSchema.pre("save", async function (req, res, next) {
-  if (this.isModify("password")) {
-    this.password = await bcrypt.hash(this.Password, 10);
-  }
-  next();
+userSchema.pre("save", async function (next) {
+  // Check capital "Password" and exit early if unchanged
+  if (!this.isModified("Password")) return next();
+
+  this.Password = await bcrypt.hash(this.Password, 10);
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
   const data = await bcrypt.compare(this.Password, password);
 };
+// Access Token Generator
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      FName: this.FName,
+      LName: this.LName,
+      Email: this.Email,
+      Role: this.Role,
+    },
+    process.env.Access_Token || "DEFAULT_ACCESS_SECRET",
+    {
+      expiresIn: process.env.Access_Token_expiry || "1d",
+    },
+  );
+};
 
-jwt.sign(
-  {
-    name: this.Name,
-    Email: this.Email,
-  },
-  process.env.Access_Token,
-  {
-    expiresIn: process.env.Access_token_expiry,
-  },
-);
-jwt.sign(
-  {
-    Email: this.Email,
-    Mobile: this.Mobile,
-    Role: this.Role,
-  },
-  process.env.Refresh_Token,
-  {
-    expiresIn: process.env.Refresh_Token_expiry,
-  },
-);
+// Refresh Token Generator
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.Refresh_Token || "DEFAULT_REFRESH_SECRET",
+    {
+      expiresIn: process.env.Refresh_Token_expiry || "10d",
+    },
+  );
+};
+export const User = mongoose.model("User", userSchema);
