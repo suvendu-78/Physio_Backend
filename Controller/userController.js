@@ -108,11 +108,6 @@ const Login = Async(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const passwordValid = await user.isPasswordCorrect(Password);
-  if (!passwordValid) {
-    throw new ApiError(400, "Password is incorrect");
-  }
-
   const accessToken = user.generateAccessToken();
 
   const logedin = await User.findById(user._id).select(
