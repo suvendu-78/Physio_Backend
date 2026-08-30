@@ -102,8 +102,11 @@ const Signup = Async(async (req, res, next) => {
 
 const Login = Async(async (req, res) => {
   const { Email, Password } = req.body;
+
   console.log(req.body);
+
   const user = await User.findOne({ Email });
+
   if (!user) {
     throw new ApiError(404, "User not found");
   }
@@ -114,26 +117,17 @@ const Login = Async(async (req, res) => {
     "-Password -refreshToken",
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
-  return (
-    res
-      .status(200)
-      .cookie("accessToken", accessToken, options)
-      // .cookie("refreshToken", refreshToken, options) // Uncomment if you have refreshToken
-      .json(
-        new Apiresponse(
-          200,
-          { logedin, accessToken },
-          "User logged in successfully",
-        ),
-      )
+  return res.status(200).json(
+    new Apiresponse(
+      200,
+      {
+        logedin,
+        accessToken,
+      },
+      "User logged in successfully",
+    ),
   );
 });
-
 const Booking = Async(async (req, res, next) => {
   const { Type, Date, Time, Fullname, Age, Number, Problem, Address } =
     req.body;
@@ -156,4 +150,23 @@ const Booking = Async(async (req, res, next) => {
     .json(new Apiresponse(200, {}, "Booking created successfully"));
 });
 
-export { Signup, Login, Booking };
+const GetUser = Async(async (req, res) => {
+  console.log("REQ.USER:", req.user);
+
+  const user = await User.findById(req.user._id).select(
+    "-Password -Refresh_Token",
+  );
+
+  console.log("USER FROM DB:", user);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: user,
+    message: "User data fetched successfully",
+  });
+});
+export { Signup, Login, Booking, GetUser };

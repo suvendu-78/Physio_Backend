@@ -4,7 +4,7 @@ import cors from "cors";
 import multer from "multer";
 dotenv.config();
 const App = express();
-App.use(cors({ origin: process.env.Cors }));
+App.use(cors({ origin: "http://localhost:5173", credentials: true }));
 App.use(express.json({ limit: "50mb" }));
 App.use(express.urlencoded({ extended: true }));
 
