@@ -51,59 +51,38 @@ const Signup = Async(async (req, res, next) => {
   }
 });
 
-// const Login = Async(async (req, res, next) => {
+// const Login = Async(async (req, res) => {
 //   const { Email, Password } = req.body;
 
-//   console.log("Login Payload:", req.body);
-//   if (!Email) {
-//     throw new ApiError(400, "Email is required!");
-//   }
-//   if (!Password) {
-//     throw new ApiError(400, "Password is required!");
-//   }
+//   console.log(req.body);
 
-//   const user = await User.findOne({ Email: Email.toLowerCase().trim() });
+//   const user = await User.findOne({ Email });
+
 //   if (!user) {
-//     throw new ApiError(404, "User does not exist. Please sign up first.");
-//   }
-
-//   const isPasswordValid = await user.isPasswordCorrect(Password);
-//   if (!isPasswordValid) {
-//     throw new ApiError(401, "Invalid user credentials");
+//     throw new ApiError(404, "User not found");
 //   }
 
 //   const accessToken = user.generateAccessToken();
-//   const refreshToken = user.generateRefreshToken();
 
-//   user.Refresh_Token = refreshToken;
-//   await user.save({ validateBeforeSave: false });
-
-//   const loggedInUser = await User.findById(user._id).select(
-//     "-Password -Refresh_Token",
+//   const logedin = await User.findById(user._id).select(
+//     "-Password -refreshToken",
 //   );
 
-//   const options = {
-//     httpOnly: true,
-//     secure: process.env.NODE_ENV === "production",
-//   };
-
-//   return res
-//     .status(200)
-//     .cookie("accessToken", accessToken, options)
-//     .cookie("refreshToken", refreshToken, options)
-//     .json(
-//       new Apiresponse(
-//         200,
-//         { user: loggedInUser, accessToken, refreshToken },
-//         "Login successful",
-//       ),
-//     );
+//   return res.status(200).json(
+//     new Apiresponse(
+//       200,
+//       {
+//         logedin,
+//         accessToken,
+//       },
+//       "User logged in successfully",
+//     ),
+//   );
 // });
-
 const Login = Async(async (req, res) => {
   const { Email, Password } = req.body;
 
-  console.log(req.body);
+  console.log("LOGIN DATA:", req.body);
 
   const user = await User.findOne({ Email });
 
@@ -111,18 +90,38 @@ const Login = Async(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
+  // IMPORTANT:
+  // You should verify Password here.
+  // Use your existing password comparison method if you have one.
+
   const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
 
   const logedin = await User.findById(user._id).select(
-    "-Password -refreshToken",
+    "-Password -Refresh_Token",
   );
+
+  // Access Token Cookie
+  res.cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: false, // true in production HTTPS
+    sameSite: "lax",
+    maxAge: 15 * 60 * 1000,
+  });
+
+  // Refresh Token Cookie
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: false, // true in production HTTPS
+    sameSite: "lax",
+    maxAge: 10 * 24 * 60 * 60 * 1000,
+  });
 
   return res.status(200).json(
     new Apiresponse(
       200,
       {
         logedin,
-        accessToken,
       },
       "User logged in successfully",
     ),
@@ -169,4 +168,65 @@ const GetUser = Async(async (req, res) => {
     message: "User data fetched successfully",
   });
 });
-export { Signup, Login, Booking, GetUser };
+
+const RefreshAccessToken = Async(async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token missing",
+      });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.Refresh_Token);
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const newAccessToken = user.generateAccessToken();
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res
+      .status(200)
+      .json(new Apiresponse(200, {}, "Access token refreshed successfully"));
+  } catch (error) {
+    console.log("REFRESH TOKEN ERROR:", error.message);
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired refresh token",
+    });
+  }
+});
+const Logout = Async(async (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res
+    .status(200)
+    .json(new Apiresponse(200, {}, "User logged out successfully"));
+});
+export { Signup, Login, Booking, GetUser, RefreshAccessToken, Logout };
