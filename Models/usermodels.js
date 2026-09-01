@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import multer from "multer";
 const userSchema = new mongoose.Schema(
   {
     FName: {
@@ -34,19 +35,27 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     Refresh_Token: {},
+    resetPasswordToken: {
+      type: String,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+    },
   },
   { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {
   // Check capital "Password" and exit early if unchanged
-  if (!this.isModified("Password")) return next();
+  if (!this.isModified("Password")) return;
 
   this.Password = await bcrypt.hash(this.Password, 10);
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
   const data = await bcrypt.compare(this.Password, password);
+  return data;
 };
 // Access Token Generator
 userSchema.methods.generateAccessToken = function () {

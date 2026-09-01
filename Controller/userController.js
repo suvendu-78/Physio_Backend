@@ -2,7 +2,8 @@ import Async from "../UTLS/Async.js";
 import ApiError from "../UTLS/Apierror.js";
 import Apiresponse from "../UTLS/Apiresponse.js";
 import { User } from "../Models/usermodels.js";
-
+import crypto from "crypto";
+import sendMail from "../Mail/nodemail.js";
 const Signup = Async(async (req, res, next) => {
   try {
     const { FName, LName, Role, Email, Password, Mobile, Address } = req.body;
@@ -51,34 +52,6 @@ const Signup = Async(async (req, res, next) => {
   }
 });
 
-// const Login = Async(async (req, res) => {
-//   const { Email, Password } = req.body;
-
-//   console.log(req.body);
-
-//   const user = await User.findOne({ Email });
-
-//   if (!user) {
-//     throw new ApiError(404, "User not found");
-//   }
-
-//   const accessToken = user.generateAccessToken();
-
-//   const logedin = await User.findById(user._id).select(
-//     "-Password -refreshToken",
-//   );
-
-//   return res.status(200).json(
-//     new Apiresponse(
-//       200,
-//       {
-//         logedin,
-//         accessToken,
-//       },
-//       "User logged in successfully",
-//     ),
-//   );
-// });
 const Login = Async(async (req, res) => {
   const { Email, Password } = req.body;
 
@@ -229,4 +202,123 @@ const Logout = Async(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, {}, "User logged out successfully"));
 });
-export { Signup, Login, Booking, GetUser, RefreshAccessToken, Logout };
+
+// const Forgetpassword = Async(async (req, res, next) => {
+//   const { Email } = req.body;
+//   console.log(Email);
+//   const exist = await User.findOne({ Email: Email });
+//   if (!exist) {
+//     throw new ApiError(404, "User not found");
+//   }
+//   const resetToken = crypto.randomBytes(32).toString("hex");
+
+//   exist.resetPasswordToken = resetToken;
+//   exist.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+//   await exist.save();
+
+//   console.log("Reset token:", resetToken);
+
+//   const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+
+//   await sendMail(
+//     exist.Email,
+//     "Reset Your Password",
+//     `
+//       <h2>Reset Your Password</h2>
+
+//       <p>Hello,</p>
+
+//       <p>You requested to reset your password.</p>
+
+//       <p>Click the button below:</p>
+
+//       <a href="${resetUrl}">
+//         Reset Password
+//       </a>
+
+//       <p>This link will expire in 15 minutes.</p>
+
+//       <p>If you did not request this, ignore this email.</p>
+//     `,
+//   );
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Password reset link sent to your email",
+//   });
+// });
+
+const Forgetpassword = Async(async (req, res, next) => {
+  const { Email } = req.body;
+
+  console.log("1. Email:", Email);
+
+  const exist = await User.findOne({ Email: Email });
+
+  console.log("2. User:", exist ? "Found" : "Not Found");
+
+  if (!exist) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  console.log("3. Token generated");
+
+  exist.resetPasswordToken = resetToken;
+  exist.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+  try {
+    await exist.save();
+
+    console.log("4. Token saved");
+  } catch (error) {
+    console.log("SAVE ERROR:", error);
+    throw error;
+  }
+
+  // console.log("4. Token saved");
+
+  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+
+  console.log("5. Reset URL created");
+
+  await sendMail(
+    exist.Email,
+    "Reset Your Password",
+    `
+      <h2>Reset Your Password</h2>
+
+      <p>Hello,</p>
+
+      <p>You requested to reset your password.</p>
+
+      <p>Click the button below:</p>
+
+      <a href="${resetUrl}">
+        Reset Password
+      </a>
+
+      <p>This link will expire in 15 minutes.</p>
+
+      <p>If you did not request this, ignore this email.</p>
+    `,
+  );
+
+  console.log("6. Email sent");
+
+  res.status(200).json({
+    success: true,
+    message: "Password reset link sent to your email",
+  });
+});
+export {
+  Signup,
+  Login,
+  Booking,
+  GetUser,
+  RefreshAccessToken,
+  Logout,
+  Forgetpassword,
+};
