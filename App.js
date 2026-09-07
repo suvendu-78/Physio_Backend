@@ -12,7 +12,7 @@ App.use(
     credentials: true,
   }),
 );
-App.use(express.json({ limit: "50mb" }));   
+App.use(express.json({ limit: "50mb" }));
 App.use(express.urlencoded({ extended: true }));
 App.use(cookieParser());
 import Router from "./Router/router.js";
@@ -22,4 +22,8 @@ App.use("/api/v1/user", Router);
 import AdminRouter from "./Admin/Admin_Router/admin_Router.js";
 
 App.use("/api/v1/onboard", AdminRouter);
+
+import PattnerRouter from "./Admin/Admin_Router/pattner_Router.js";
+
+App.use("/api/v1/pattner", PattnerRouter);
 export default App;

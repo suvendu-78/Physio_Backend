@@ -203,52 +203,6 @@ const Logout = Async(async (req, res) => {
     .json(new Apiresponse(200, {}, "User logged out successfully"));
 });
 
-// const Forgetpassword = Async(async (req, res, next) => {
-//   const { Email } = req.body;
-//   console.log(Email);
-//   const exist = await User.findOne({ Email: Email });
-//   if (!exist) {
-//     throw new ApiError(404, "User not found");
-//   }
-//   const resetToken = crypto.randomBytes(32).toString("hex");
-
-//   exist.resetPasswordToken = resetToken;
-//   exist.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
-
-//   await exist.save();
-
-//   console.log("Reset token:", resetToken);
-
-//   const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
-
-//   await sendMail(
-//     exist.Email,
-//     "Reset Your Password",
-//     `
-//       <h2>Reset Your Password</h2>
-
-//       <p>Hello,</p>
-
-//       <p>You requested to reset your password.</p>
-
-//       <p>Click the button below:</p>
-
-//       <a href="${resetUrl}">
-//         Reset Password
-//       </a>
-
-//       <p>This link will expire in 15 minutes.</p>
-
-//       <p>If you did not request this, ignore this email.</p>
-//     `,
-//   );
-
-//   res.status(200).json({
-//     success: true,
-//     message: "Password reset link sent to your email",
-//   });
-// });
-
 const Forgetpassword = Async(async (req, res, next) => {
   const { Email } = req.body;
 
