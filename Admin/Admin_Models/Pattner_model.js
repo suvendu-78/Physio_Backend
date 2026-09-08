@@ -5,7 +5,7 @@ const PattnerSchema = new mongoose.Schema(
   {
     fullName: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
     },
 
@@ -58,7 +58,15 @@ const PattnerSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    ownerName: {
+      type: String,
+      trim: true,
+    },
 
+    clinicType: {
+      type: String,
+      trim: true,
+    },
     address: {
       type: String,
       trim: true,
@@ -119,9 +127,10 @@ PattnerSchema.pre("save", async function (next) {
   }
 });
 PattnerSchema.methods.isPasswordCorrect = async function (password) {
-  const Pattner_data = await bcrypt.compare(this.Password, password);
+  const Pattner_data = await bcrypt.compare(password, this.Password);
+  return Pattner_data;
 };
-PattnerSchema.method.PattnergererateAccesstoke = function () {
+PattnerSchema.methods.PattnergererateAccesstoke = function () {
   return jwt.sign(
     {
       id: this.id,
@@ -140,7 +149,7 @@ PattnerSchema.methods.PattnergenerateRefreshtoken = function () {
       id: this.id,
       name: this.fullName,
       email: this.email,
-      moblie: this.moblie,
+      moblie: this.phone,
     },
     process.env.Refresh_Token,
     {

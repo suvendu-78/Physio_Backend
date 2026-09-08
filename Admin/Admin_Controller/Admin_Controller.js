@@ -55,7 +55,13 @@ const Admin_Signup = Admin_Async(async (req, res, next) => {
 
 const AminLogin = Admin_Async(async (req, res) => {
   const { Email, Password } = req.body;
-
+  console.log(req.body);
+  if (!Email) {
+    throw new ApiError(400, "Email is required");
+  }
+  if (!Password) {
+    throw new ApiError(400, "Password is required");
+  }
   console.log("LOGIN DATA:", req.body);
 
   const admin = await Admin.findOne({ Email });
@@ -98,4 +104,4 @@ const AminLogin = Admin_Async(async (req, res) => {
   );
 });
 
-export { Admin_Signup };
+export { Admin_Signup, AminLogin };
