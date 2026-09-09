@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import { User } from "../Models/usermodels.js";
+import { Pattner } from "../Models/usermodels.js";
 
-const verifyJWT = async (req, res, next) => {
+const verifyJWT_Pattner = async (req, res, next) => {
   try {
     const token = req.cookies?.accessToken;
 
@@ -18,18 +18,18 @@ const verifyJWT = async (req, res, next) => {
 
     console.log("DECODED:", decoded);
 
-    const user = await User.findById(decoded.id).select(
+    const pattner = await Pattner.findById(decoded.id).select(
       "-Password -Refresh_Token",
     );
 
-    if (!user) {
+    if (!pattner) {
       return res.status(401).json({
         success: false,
         message: "User not found",
       });
     }
 
-    req.user = user;
+    req.pattner = pattner;
 
     next();
   } catch (error) {
@@ -42,4 +42,4 @@ const verifyJWT = async (req, res, next) => {
   }
 };
 
-export default verifyJWT;
+export default verifyJWT_Pattner;

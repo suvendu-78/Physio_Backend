@@ -6,6 +6,7 @@ import {
 import {
   SignupPattner_Doctor,
   Doctor_Login,
+  Pattner_Forgetpassword,
 } from "../Admin_Controller/pattner_Doctor_controller.js";
 const PattnerRouter = express.Router();
 
@@ -13,4 +14,6 @@ PattnerRouter.route("/pattnersignup").post(SignupPattner);
 PattnerRouter.route("/SignupPattner_Doctor").post(SignupPattner_Doctor);
 PattnerRouter.route("/doctor_Login").post(Doctor_Login);
 PattnerRouter.route("/clinicLogin").post(ClinicLogin);
+PattnerRouter.route("/pattner_Forgetpassword").post(Pattner_Forgetpassword);
+
 export default PattnerRouter;
