@@ -2,6 +2,8 @@ import Admin_Async from "../Admin_Utils/Admin_Async.js";
 import Pattner from "../Admin_Models/Pattner_model.js";
 import ApiError from "../../UTLS/Apierror.js";
 import Apiresponse from "../../UTLS/Apiresponse.js";
+import Pattner_sendMail from "../Mail_Amin/pattner.nodemail.js";
+import crypto from "crypto";
 const SignupPattner = Admin_Async(async (req, res, next) => {
   try {
     const {
@@ -147,4 +149,69 @@ const ClinicLogin = Admin_Async(async (req, res) => {
   );
 });
 
-export { SignupPattner, ClinicLogin };
+const Clinic_Forgetpassword = Admin_Async(async (req, res, next) => {
+  console.log(req.body);
+  const { email } = req.body;
+  console.log(email);
+  console.log("1. Email:", email);
+
+  const exist = await Pattner.findOne({ email: email.toLowerCase() });
+  console.log("2. User:", exist ? "Found" : "Not Found");
+
+  if (!exist) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  console.log("3. Token generated");
+
+  exist.resetPasswordToken = resetToken;
+  exist.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
+
+  try {
+    await exist.save();
+
+    console.log("4. Token saved");
+  } catch (error) {
+    console.log("SAVE ERROR:", error);
+    throw error;
+  }
+
+  // console.log("4. Token saved");
+
+  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+
+  console.log("5. Reset URL created");
+
+  await Pattner_sendMail(
+    exist.email,
+    "Reset Your Password",
+    `
+      <h2>Reset Your Password</h2>
+
+      <p>Hello,</p>
+
+      <p>You requested to reset your password.</p>
+
+      <p>Click the button below:</p>
+
+      <a href="${resetUrl}">
+        Reset Password
+      </a>
+
+      <p>This link will expire in 15 minutes.</p>
+
+      <p>If you did not request this, ignore this email.</p>
+    `,
+  );
+
+  console.log("6. Email sent");
+
+  res.status(200).json({
+    success: true,
+    message: "Password reset link sent to your email",
+  });
+});
+
+export { SignupPattner, ClinicLogin, Clinic_Forgetpassword };

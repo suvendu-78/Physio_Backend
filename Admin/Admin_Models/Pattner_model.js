@@ -123,7 +123,6 @@ PattnerSchema.pre("save", async function (next) {
   if (this.isModified("Password")) {
     this.Password = await bcrypt.hash(this.Password, 10);
   } else {
-    next();
   }
 });
 PattnerSchema.methods.isPasswordCorrect = async function (password) {
