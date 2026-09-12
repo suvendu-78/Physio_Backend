@@ -1,5 +1,5 @@
 import Admin_Async from "../Admin_Utils/Admin_Async.js";
-import Pattner from "../Admin_Models/Pattner_model.js";
+import Pattner_clinic from "../Admin_Models/pattner_model_Clinic.js";
 import ApiError from "../../UTLS/Apierror.js";
 import Apiresponse from "../../UTLS/Apiresponse.js";
 import Pattner_sendMail from "../Mail_Amin/pattner.nodemail.js";
@@ -64,13 +64,13 @@ const SignupPattner = Admin_Async(async (req, res, next) => {
     if (!Password) {
       throw new ApiError(404, "Password is required !");
     }
-    const existClinic = await Pattner.findOne({
+    const existClinic = await Pattner_clinic.findOne({
       $or: [{ email: email }, { phone: phone }],
     });
     if (existClinic) {
       throw new ApiError(400, "Clinc already exist !");
     }
-    const clinic = await Pattner.create({
+    const clinic = await Pattner_clinic.create({
       clinicName: clinicName,
       ownerName: ownerName,
       email: email,
@@ -84,7 +84,7 @@ const SignupPattner = Admin_Async(async (req, res, next) => {
       Password: Password,
       role: role,
     });
-    const CreatedClinic = await Pattner.findById(clinic.id).select(
+    const CreatedClinic = await Pattner_clinic.findById(clinic.id).select(
       "-Password -Refresh_Token",
     );
 
@@ -112,13 +112,18 @@ const ClinicLogin = Admin_Async(async (req, res) => {
   if (!Password) {
     throw new ApiError(400, "Password is required");
   }
-  const clinic = await Pattner.findOne({
-    $or: [{ email: email }, { role: "clinic" }],
+  const clinic = await Pattner_clinic.findOne({
+    $or: [{ email: email }],
   });
+  const isPasswordCorrect = await clinic.isPasswordCorrect(Password);
+
+  if (!isPasswordCorrect) {
+    throw new ApiError(401, "Invalid password");
+  }
   const accessToken = clinic.PattnergererateAccesstoke();
   const refreshToken = clinic.PattnergenerateRefreshtoken();
 
-  const logedin = await Pattner.findById(clinic.id).select(
+  const logedin = await Pattner_clinic.findById(clinic.id).select(
     "-Password -Refresh_Token",
   );
 
@@ -155,7 +160,7 @@ const Clinic_Forgetpassword = Admin_Async(async (req, res, next) => {
   console.log(email);
   console.log("1. Email:", email);
 
-  const exist = await Pattner.findOne({ email: email.toLowerCase() });
+  const exist = await Pattner_clinic.findOne({ email: email.toLowerCase() });
   console.log("2. User:", exist ? "Found" : "Not Found");
 
   if (!exist) {

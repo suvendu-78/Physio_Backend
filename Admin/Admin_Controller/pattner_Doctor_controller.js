@@ -1,5 +1,5 @@
 import Admin_Async from "../Admin_Utils/Admin_Async.js";
-import Pattner from "../Admin_Models/Pattner_model.js";
+import Pattner from "../Admin_Models/Pattner_model_Doctor.js";
 import ApiError from "../../UTLS/Apierror.js";
 import Apiresponse from "../../UTLS/Apiresponse.js";
 import crypto from "crypto";
@@ -131,9 +131,21 @@ const Doctor_Login = Admin_Async(async (req, res) => {
   if (!Email) {
     throw new ApiError(400, "Email is required !");
   }
+  // const doctor = await Pattner.findOne({
+  //   $or: [{ email: Email }],
+  // });
   const doctor = await Pattner.findOne({
-    $or: [{ email: Email }],
+    email: Email.toLowerCase(),
   });
+
+  if (!doctor) {
+    throw new ApiError(401, "Invalid email or password");
+  }
+  const isPasswordValid = await doctor.isPasswordCorrect(Password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid email or password");
+  }
   const accessToken = doctor.PattnergererateAccesstoke();
   const refreshToken = doctor.PattnergenerateRefreshtoken();
 

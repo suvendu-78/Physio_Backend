@@ -12,8 +12,9 @@ const ClinicSchema = new mongoose.Schema(
       type: String,
       enum: [
         "Physiotherapy Clinic",
-        "Rehabilitation Center",
-        "Multi-speciality Clinic",
+        "Rehabilitation Clinic",
+        "Multispecialty Clinic",
+        "Sports Rehabilitation Clinic",
         "Other",
       ],
       required: true,
@@ -33,152 +34,158 @@ const ClinicSchema = new mongoose.Schema(
       trim: true,
     },
 
-    website: {
+    address: {
       type: String,
+      required: true,
       trim: true,
     },
 
-    yearEstablished: {
-      type: Number,
+    city: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    address: {
-      addressLine: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      area: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      city: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      state: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      pincode: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      location: {
-        latitude: Number,
-        longitude: Number,
-      },
+    state: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    owner: {
-      name: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      designation: {
-        type: String,
-        required: true,
-        trim: true,
-      },
-
-      phone: {
-        type: String,
-        required: true,
-      },
-
-      email: {
-        type: String,
-        required: true,
-        lowercase: true,
-        trim: true,
-      },
-    },
-
-    registration: {
-      registrationNumber: {
-        type: String,
-        trim: true,
-      },
-
-      registrationAuthority: {
-        type: String,
-        trim: true,
-      },
-
-      issueDate: {
-        type: Date,
-      },
-
-      expiryDate: {
-        type: Date,
-      },
+    pincode: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     documents: {
       clinicRegistration: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       ownerId: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       addressProof: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       applicableLicense: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       biomedicalWasteAuthorization: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       pan: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       gst: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       businessRegistration: {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
       },
 
       other: [
         {
-          name: String,
-          url: String,
-          publicId: String,
+          name: {
+            type: String,
+            trim: true,
+          },
+          url: {
+            type: String,
+          },
+          publicId: {
+            type: String,
+          },
         },
       ],
     },
 
     photos: [
       {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+        },
+        publicId: {
+          type: String,
+        },
+      },
+    ],
+
+    workingHours: [
+      {
+        day: {
+          type: String,
+          enum: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+          ],
+          required: true,
+        },
+
+        enabled: {
+          type: Boolean,
+          default: false,
+        },
+
+        open: {
+          type: String,
+        },
+
+        close: {
+          type: String,
+        },
       },
     ],
 
@@ -207,8 +214,11 @@ const ClinicSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
 const Clinic = mongoose.model("Clinic", ClinicSchema);
+
 export default Clinic;

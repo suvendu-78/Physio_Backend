@@ -5,11 +5,24 @@ const DoctorSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      // required: true,
       unique: true,
     },
 
     fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+
+    phone: {
       type: String,
       required: true,
       trim: true,
@@ -23,6 +36,13 @@ const DoctorSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["Male", "Female", "Other"],
+      required: true,
+    },
+
+    address: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     profilePhoto: {
@@ -32,15 +52,21 @@ const DoctorSchema = new mongoose.Schema(
 
     professionalType: {
       type: String,
-      enum: ["Physiotherapist"],
-      default: "Physiotherapist",
+      enum: ["Doctor", "Physiotherapist"],
+      default: "Doctor",
       required: true,
+    },
+
+    specialization: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     highestQualification: {
       type: String,
-      enum: ["BPT", "MPT", "Other"],
       required: true,
+      trim: true,
     },
 
     otherQualification: {
@@ -48,20 +74,19 @@ const DoctorSchema = new mongoose.Schema(
       trim: true,
     },
 
-    specialization: {
-      type: String,
-      trim: true,
-    },
-
     universityOrCollege: {
       type: String,
-      required: true,
       trim: true,
     },
 
     yearOfGraduation: {
       type: Number,
+    },
+
+    experience: {
+      type: Number,
       required: true,
+      min: 0,
     },
 
     registration: {
@@ -73,7 +98,6 @@ const DoctorSchema = new mongoose.Schema(
 
       registrationCouncil: {
         type: String,
-        required: true,
         trim: true,
       },
 
@@ -82,35 +106,117 @@ const DoctorSchema = new mongoose.Schema(
       },
     },
 
+    consultationFee: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    availableDays: [
+      {
+        type: String,
+        enum: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      },
+    ],
+
+    about: {
+      type: String,
+      trim: true,
+    },
+
+    clinic: {
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      type: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      address: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      city: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      state: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      pincode: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+
+      phone: {
+        type: String,
+        trim: true,
+      },
+
+      workingHours: {
+        type: String,
+        trim: true,
+      },
+    },
+
     documents: {
+      medicalLicense: {
+        url: String,
+        publicId: String,
+        fileName: String,
+      },
+
+      identityProof: {
+        url: String,
+        publicId: String,
+        fileName: String,
+      },
+
       degreeCertificate: {
         url: String,
         publicId: String,
+        fileName: String,
       },
 
-      registrationCertificate: {
+      experienceCertificate: {
         url: String,
         publicId: String,
+        fileName: String,
       },
 
-      governmentId: {
+      profilePhoto: {
         url: String,
         publicId: String,
+        fileName: String,
       },
+
+      clinicImages: [
+        {
+          url: String,
+          publicId: String,
+          fileName: String,
+        },
+      ],
 
       additionalQualifications: [
         {
           name: String,
           url: String,
           publicId: String,
-        },
-      ],
-
-      experienceCertificate: [
-        {
-          name: String,
-          url: String,
-          publicId: String,
+          fileName: String,
         },
       ],
 
@@ -119,6 +225,7 @@ const DoctorSchema = new mongoose.Schema(
           name: String,
           url: String,
           publicId: String,
+          fileName: String,
         },
       ],
     },

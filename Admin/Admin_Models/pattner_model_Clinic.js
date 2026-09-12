@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-const PattnerSchema = new mongoose.Schema(
+const PattnerSchema_Clinic = new mongoose.Schema(
   {
     fullName: {
       type: String,
@@ -30,7 +30,7 @@ const PattnerSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["clinic", "doctor", "patient", "admin"],
+      enum: ["clinic"],
       required: true,
     },
 
@@ -119,17 +119,17 @@ const PattnerSchema = new mongoose.Schema(
   },
 );
 
-PattnerSchema.pre("save", async function (next) {
+PattnerSchema_Clinic.pre("save", async function (next) {
   if (this.isModified("Password")) {
     this.Password = await bcrypt.hash(this.Password, 10);
   } else {
   }
 });
-PattnerSchema.methods.isPasswordCorrect = async function (password) {
+PattnerSchema_Clinic.methods.isPasswordCorrect = async function (password) {
   const Pattner_data = await bcrypt.compare(password, this.Password);
   return Pattner_data;
 };
-PattnerSchema.methods.PattnergererateAccesstoke = function () {
+PattnerSchema_Clinic.methods.PattnergererateAccesstoke = function () {
   return jwt.sign(
     {
       id: this.id,
@@ -142,7 +142,7 @@ PattnerSchema.methods.PattnergererateAccesstoke = function () {
     },
   );
 };
-PattnerSchema.methods.PattnergenerateRefreshtoken = function () {
+PattnerSchema_Clinic.methods.PattnergenerateRefreshtoken = function () {
   return jwt.sign(
     {
       id: this.id,
@@ -156,6 +156,6 @@ PattnerSchema.methods.PattnergenerateRefreshtoken = function () {
     },
   );
 };
-const Pattner = mongoose.model("Pattner", PattnerSchema);
+const Pattner_clinic = mongoose.model("Pattner_Clinic", PattnerSchema_Clinic);
 
-export default Pattner;
+export default Pattner_clinic;
