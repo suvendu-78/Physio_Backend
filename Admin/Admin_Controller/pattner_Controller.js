@@ -4,6 +4,7 @@ import ApiError from "../../UTLS/Apierror.js";
 import Apiresponse from "../../UTLS/Apiresponse.js";
 import Pattner_sendMail from "../Mail_Amin/pattner.nodemail.js";
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
 const SignupPattner = Admin_Async(async (req, res, next) => {
   try {
     const {
@@ -219,4 +220,58 @@ const Clinic_Forgetpassword = Admin_Async(async (req, res, next) => {
   });
 });
 
-export { SignupPattner, ClinicLogin, Clinic_Forgetpassword };
+const verifyJWTClinic = Admin_Async(async (req, res, next) => {
+  try {
+    const token =
+      req.cookies?.accessToken ||
+      req.header("Authorization")?.replace("Bearer ", "");
+
+    if (!token) {
+      throw new ApiError(401, "Unauthorized request");
+    }
+
+    const decodedToken = jwt.verify(token, process.env.Access_Token);
+
+    const clinic = await Pattner_clinic.findById(decodedToken?.id).select(
+      "-Password -Refresh_Token",
+    );
+
+    if (!clinic) {
+      throw new ApiError(401, "Invalid access token");
+    }
+
+    req.clinic = clinic;
+    req.user = clinic;
+
+    next();
+  } catch (error) {
+    throw new ApiError(401, "Invalid or expired access token");
+  }
+});
+
+const getClinic = Admin_Async(async (req, res) => {
+  const clinicId = req.clinic?.id || req.user?.id;
+
+  if (!clinicId) {
+    throw new ApiError(401, "Clinic not authenticated");
+  }
+
+  const clinic = await Pattner_clinic.findById(clinicId).select(
+    "-Password -Refresh_Token",
+  );
+
+  if (!clinic) {
+    throw new ApiError(404, "Clinic not found");
+  }
+
+  return res
+    .status(200)
+    .json(new Apiresponse(200, clinic, "Clinic fetched successfully"));
+});
+export {
+  SignupPattner,
+  ClinicLogin,
+  Clinic_Forgetpassword,
+  verifyJWTClinic,
+  getClinic,
+};

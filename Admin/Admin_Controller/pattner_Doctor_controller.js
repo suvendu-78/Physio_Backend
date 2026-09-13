@@ -4,7 +4,7 @@ import ApiError from "../../UTLS/Apierror.js";
 import Apiresponse from "../../UTLS/Apiresponse.js";
 import crypto from "crypto";
 import Pattner_sendMail from "../Mail_Amin/pattner.nodemail.js";
-
+import jwt from "jsonwebtoken";
 const SignupPattner_Doctor = Admin_Async(async (req, res, next) => {
   try {
     const {
@@ -245,4 +245,48 @@ const Pattner_Forgetpassword = Admin_Async(async (req, res, next) => {
   });
 });
 
-export { SignupPattner_Doctor, Doctor_Login, Pattner_Forgetpassword };
+const VerifyDoctorJWT = Admin_Async(async (req, res, next) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+  const decodedToken = jwt.verify(token, process.env.Access_Token);
+
+  if (!decodedToken) {
+    throw new ApiError(401, "Invalid access token");
+  }
+
+  req.user = decodedToken;
+
+  next();
+});
+
+const findDoctor = Admin_Async(async (req, res) => {
+  const doctor = await Pattner.findById(req.user.id).select(
+    "-Password -Refresh_Token",
+  );
+
+  if (!doctor) {
+    throw new ApiError(404, "Doctor not found");
+  }
+
+  return res.status(200).json(
+    new Apiresponse(
+      200,
+      {
+        doctor,
+      },
+      "Doctor data fetched successfully",
+    ),
+  );
+});
+
+export {
+  SignupPattner_Doctor,
+  Doctor_Login,
+  Pattner_Forgetpassword,
+  VerifyDoctorJWT,
+  findDoctor,
+};

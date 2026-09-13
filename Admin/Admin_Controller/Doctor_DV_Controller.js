@@ -384,4 +384,49 @@ const Doctor_DV = Admin_Async(async (req, res) => {
     );
 });
 
-export { Doctor_DV };
+const UpdateDoctorVerification = Admin_Async(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action, message } = req.body;
+
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found",
+      });
+    }
+
+    if (action === "approve") {
+      doctor.verificationStatus = "approved";
+      doctor.isActive = true;
+    } else if (action === "reject") {
+      doctor.verificationStatus = "rejected";
+      doctor.isActive = false;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid action",
+      });
+    }
+
+    await doctor.save();
+
+    return res.status(200).json({
+      success: true,
+      message:
+        action === "approve"
+          ? "Doctor approved successfully"
+          : "Doctor rejected successfully",
+      data: doctor,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+export { Doctor_DV, UpdateDoctorVerification };

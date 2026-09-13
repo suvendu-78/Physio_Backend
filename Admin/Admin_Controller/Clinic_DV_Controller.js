@@ -170,4 +170,49 @@ const CliniDv = Admin_Async(async (req, res) => {
   }
 });
 
-export { CliniDv };
+const UpdateClinicVerification = Admin_Async(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action, message } = req.body;
+
+    const clinic = await Clinic.findById(id);
+
+    if (!clinic) {
+      return res.status(404).json({
+        success: false,
+        message: "Clinic not found",
+      });
+    }
+
+    if (action === "approve") {
+      clinic.verificationStatus = "approved";
+      clinic.isActive = true;
+    } else if (action === "reject") {
+      clinic.verificationStatus = "rejected";
+      clinic.isActive = false;
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid action",
+      });
+    }
+
+    await clinic.save();
+
+    return res.status(200).json({
+      success: true,
+      message:
+        action === "approve"
+          ? "Clinic approved successfully"
+          : "Clinic rejected successfully",
+      data: clinic,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+export { CliniDv, UpdateClinicVerification };

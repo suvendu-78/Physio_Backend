@@ -4,6 +4,9 @@ import ApiError from "../../UTLS/Apierror.js";
 import Apiresponse from "../../UTLS/Apiresponse.js";
 import Pattner_sendMail from "../Mail_Amin/pattner.nodemail.js";
 import crypto from "crypto";
+import Doctor from "../Admin_Models/pattner_model_DoctorDV.js";
+import Clinic from "../Admin_Models/pattner_model_ClinicDV.js";
+import jwt from "jsonwebtoken";
 const Admin_Signup = Admin_Async(async (req, res, next) => {
   try {
     const { Name, Email, Password, Mobile, Secretcode } = req.body;
@@ -178,4 +181,91 @@ const Admin_Forgetpassword = Admin_Async(async (req, res, next) => {
     message: "Password reset link sent to your email",
   });
 });
-export { Admin_Signup, AminLogin, Admin_Forgetpassword };
+
+const GetPendingDoctors = Admin_Async(async (req, res) => {
+  try {
+    const doctors = await Doctor.find({
+      verificationStatus: "pending",
+      isActive: false,
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: doctors,
+      message: "Pending doctors fetched successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+const clinicpendingData = Admin_Async(async (req, res) => {
+  try {
+    const clinicdv = await Clinic.findOne({
+      verificationStatus: "pending",
+      isActive: false,
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      data: clinicdv,
+      message: "Pending clinics fetched successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+const VerifyAdminJWT = Admin_Async(async (req, res, next) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    throw new ApiError(401, "Unauthorized request");
+  }
+
+  const decodedToken = jwt.verify(token, process.env.Access_Token);
+
+  if (!decodedToken) {
+    throw new ApiError(401, "Invalid access token");
+  }
+
+  req.user = decodedToken;
+
+  next();
+});
+
+const FindAdmin = Admin_Async(async (req, res) => {
+  const admin = await Admin.findById(req.user.id).select(
+    "-Password -Refresh_Token",
+  );
+
+  if (!admin) {
+    throw new ApiError(404, "Admin not found");
+  }
+
+  return res.status(200).json(
+    new Apiresponse(
+      200,
+      {
+        admin,
+      },
+      "Admin data fetched successfully",
+    ),
+  );
+});
+
+export {
+  Admin_Signup,
+  AminLogin,
+  Admin_Forgetpassword,
+  GetPendingDoctors,
+  clinicpendingData,
+  FindAdmin,
+  VerifyAdminJWT,
+};
