@@ -8,6 +8,8 @@ import {
   RefreshAccessToken,
   Logout,
   Forgetpassword,
+  findDoctor,
+  findclinic,
 } from "../Controller/userController.js";
 
 const Router = express.Router();
@@ -19,4 +21,6 @@ Router.route("/getuser").get(verifyJWT, GetUser);
 Router.route("/refreshAccessToken").post(RefreshAccessToken);
 Router.route("/logout").post(Logout);
 Router.route("/forgetpassword").post(Forgetpassword);
+Router.route("/findDoctor").get(findDoctor);
+Router.route("/findclinic").get(findclinic);
 export default Router;

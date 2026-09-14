@@ -4,13 +4,15 @@ import Apiresponse from "../UTLS/Apiresponse.js";
 import { User } from "../Models/usermodels.js";
 import crypto from "crypto";
 import sendMail from "../Mail/nodemail.js";
+import Clinic from "../Admin/Admin_Models/pattner_model_ClinicDV.js";
+import Doctor from "../Admin/Admin_Models/pattner_model_DoctorDV.js";
 const Signup = Async(async (req, res, next) => {
   try {
     const { FName, LName, Role, Email, Password, Mobile, Address } = req.body;
     console.log("RECEIVED DATA:", req.body);
 
     if (!FName) throw new ApiError(400, "First name is required!");
-    if (!LName) throw new ApiError(400, "Last name is required!");
+    if (!LName) throw new ApiError(400, "Last name is requicred!");
     if (!Role) throw new ApiError(400, "Role is required!");
     if (!Email) throw new ApiError(400, "Email is required!");
     if (!Password) throw new ApiError(400, "Password is required!");
@@ -267,6 +269,61 @@ const Forgetpassword = Async(async (req, res, next) => {
     message: "Password reset link sent to your email",
   });
 });
+
+const findDoctor = Async(async (req, res) => {
+  const doctors = await Doctor.find({
+    isActive: true,
+    verificationStatus: "approved",
+  });
+
+  return res
+    .status(200)
+    .json(
+      new Apiresponse(200, doctors, "Verified doctors fetched successfully"),
+    );
+});
+
+const findclinic = Async(async (req, res) => {
+  const Activeclinic = await Clinic.find({
+    isActive: true,
+    verificationStatus: "approved",
+  });
+
+  return res
+    .status(200)
+    .json(
+      new Apiresponse(
+        200,
+        Activeclinic,
+        "Verified clinics fetched successfully",
+      ),
+    );
+});
+const findDoctorsByClinic = Async(async (req, res) => {
+  const { clinicName } = req.params;
+
+  if (!clinicName) {
+    throw new ApiError(400, "Clinic name is required");
+  }
+
+  const doctors = await Doctor.find({
+    clinicName: clinicName,
+    isActive: true,
+    verificationStatus: "approved",
+  });
+
+  return res
+    .status(200)
+    .json(
+      new Apiresponse(
+        200,
+        doctors,
+        doctors.length > 0
+          ? "Doctors fetched successfully"
+          : "No doctors found for this clinic",
+      ),
+    );
+});
 export {
   Signup,
   Login,
@@ -275,4 +332,7 @@ export {
   RefreshAccessToken,
   Logout,
   Forgetpassword,
+  findDoctor,
+  findclinic,
+  findDoctorsByClinic,
 };
