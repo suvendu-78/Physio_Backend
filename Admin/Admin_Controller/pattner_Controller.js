@@ -268,10 +268,29 @@ const getClinic = Admin_Async(async (req, res) => {
     .status(200)
     .json(new Apiresponse(200, clinic, "Clinic fetched successfully"));
 });
+const ClinicLogout = Admin_Async(async (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Admin logged out successfully",
+  });
+});
 export {
   SignupPattner,
   ClinicLogin,
   Clinic_Forgetpassword,
   verifyJWTClinic,
   getClinic,
+  ClinicLogout,
 };

@@ -363,13 +363,13 @@ const Doctor_DV = Admin_Async(async (req, res) => {
 
   try {
     await doctor.save();
-    console.log("DOCTOR SAVED SUCCESSFULLY:", doctor._id);
+    console.log("DOCTOR SAVED SUCCESSFULLY:", doctor.id);
   } catch (error) {
     console.error("DOCTOR SAVE ERROR:", error);
     throw error;
   }
 
-  const updatedDoctor = await Doctor.findById(doctor._id).select(
+  const updatedDoctor = await Doctor.findById(doctor.id).select(
     "-Password -otp",
   );
 
@@ -429,4 +429,34 @@ const UpdateDoctorVerification = Admin_Async(async (req, res) => {
   }
 });
 
-export { Doctor_DV, UpdateDoctorVerification };
+const getDoctorDocumentVerification = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+
+    const doctor = await Doctor.findById(doctorId).select(
+      "fullName email verificationStatus rejectionReason verifiedAt",
+    );
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Document verification data fetched successfully",
+      data: doctor,
+    });
+  } catch (error) {
+    console.error("GET DOCUMENT VERIFICATION ERROR:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch document verification data",
+      error: error.message,
+    });
+  }
+};
+export { Doctor_DV, UpdateDoctorVerification, getDoctorDocumentVerification };

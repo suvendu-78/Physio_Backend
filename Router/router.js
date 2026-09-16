@@ -10,6 +10,7 @@ import {
   Forgetpassword,
   findDoctor,
   findclinic,
+  findDoctorsByClinic
 } from "../Controller/userController.js";
 
 const Router = express.Router();
@@ -23,4 +24,5 @@ Router.route("/logout").post(Logout);
 Router.route("/forgetpassword").post(Forgetpassword);
 Router.route("/findDoctor").get(findDoctor);
 Router.route("/findclinic").get(findclinic);
+Router.route("/findDoctorsByClinic").get(findDoctorsByClinic)
 export default Router;

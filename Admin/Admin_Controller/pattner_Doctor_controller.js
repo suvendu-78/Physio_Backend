@@ -282,11 +282,29 @@ const findDoctor = Admin_Async(async (req, res) => {
     ),
   );
 });
+const DoctorLogout = Admin_Async(async (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
 
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Admin logged out successfully",
+  });
+});
 export {
   SignupPattner_Doctor,
   Doctor_Login,
   Pattner_Forgetpassword,
   VerifyDoctorJWT,
   findDoctor,
+  DoctorLogout,
 };

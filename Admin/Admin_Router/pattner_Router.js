@@ -5,6 +5,7 @@ import {
   Clinic_Forgetpassword,
   verifyJWTClinic,
   getClinic,
+  ClinicLogout,
 } from "../Admin_Controller/pattner_Controller.js";
 import {
   SignupPattner_Doctor,
@@ -12,6 +13,7 @@ import {
   Pattner_Forgetpassword,
   VerifyDoctorJWT,
   findDoctor,
+  DoctorLogout,
 } from "../Admin_Controller/pattner_Doctor_controller.js";
 import {
   doctorUpload,
@@ -21,6 +23,7 @@ import upload from "../Admin_Middlewire/DV_pattner_middlewire.js";
 import {
   Doctor_DV,
   UpdateDoctorVerification,
+  getDoctorDocumentVerification,
 } from "../Admin_Controller/Doctor_DV_Controller.js";
 import {
   CliniDv,
@@ -40,4 +43,11 @@ PattnerRouter.route("/clinic/status/:id").patch(UpdateClinicVerification);
 PattnerRouter.route("/getclinic").get(verifyJWTClinic, getClinic);
 PattnerRouter.route("/doctor/status/:id").patch(UpdateDoctorVerification);
 PattnerRouter.route("/finddoctor").get(VerifyDoctorJWT, findDoctor);
+PattnerRouter.route("/doctorLogout").post(DoctorLogout);
+PattnerRouter.route("/clinicLogout").post(ClinicLogout);
+PattnerRouter.get(
+  "/doctor/document-verification",
+  VerifyDoctorJWT,
+  getDoctorDocumentVerification,
+);
 export default PattnerRouter;

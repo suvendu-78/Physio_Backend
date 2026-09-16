@@ -259,6 +259,61 @@ const FindAdmin = Admin_Async(async (req, res) => {
     ),
   );
 });
+const AdminLogout = Admin_Async(async (req, res) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Admin logged out successfully",
+  });
+});
+
+// const updateSettings = async (req, res) => {
+//   console.log(req.body);
+//   try {
+//     const updatedAdmin = await Admin.findOneAndUpdate(
+//       {},
+//       {
+//         $set: req.body,
+//       },
+//       {
+//         new: true,
+//         runValidators: true,
+//       },
+//     );
+
+//     if (!updatedAdmin) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Admin data not found",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "Admin settings updated successfully",
+//       data: updatedAdmin,
+//     });
+//   } catch (error) {
+//     console.error("UPDATE ADMIN SETTINGS ERROR:", error);
+
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to update admin settings",
+//       error: error.message,
+//     });
+//   }
+// };
 
 export {
   Admin_Signup,
@@ -268,4 +323,6 @@ export {
   clinicpendingData,
   FindAdmin,
   VerifyAdminJWT,
+  AdminLogout,
+  // updateSettings,
 };
