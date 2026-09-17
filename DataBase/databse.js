@@ -8,6 +8,7 @@ const Database = async () => {
     return data;
   } catch (error) {
     console.log("database not connected", error);
+    throw error;
   }
 };
 export default Database;

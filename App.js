@@ -28,36 +28,40 @@
 // App.use("/api/v1/pattner", PattnerRouter);
 // export default App;
 
-import App from "./App.js";
-import Database from "./DataBase/databse.js";
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
-const databaseConnection = Database();
+dotenv.config();
 
-App.use(async (req, res, next) => {
-  try {
-    await databaseConnection;
-    next();
-  } catch (error) {
-    console.log("Database connection error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Database connection failed",
-    });
-  }
+const App = express();
+
+App.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true,
+  }),
+);
+
+App.use(express.json({ limit: "50mb" }));
+App.use(express.urlencoded({ extended: true }));
+App.use(cookieParser());
+
+App.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Physio backend is running",
+  });
 });
 
-if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 8000;
+import Router from "./Router/router.js";
+App.use("/api/v1/user", Router);
 
-  databaseConnection
-    .then(() => {
-      App.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-      });
-    })
-    .catch((error) => {
-      console.log("There is some error from database:", error);
-    });
-}
+import AdminRouter from "./Admin/Admin_Router/admin_Router.js";
+App.use("/api/v1/onboard", AdminRouter);
+
+import PattnerRouter from "./Admin/Admin_Router/pattner_Router.js";
+App.use("/api/v1/pattner", PattnerRouter);
 
 export default App;
