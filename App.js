@@ -44,6 +44,13 @@ App.use(
   }),
 );
 
+App.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Physio backend is running",
+  });
+});
+
 App.use(express.json({ limit: "50mb" }));
 App.use(express.urlencoded({ extended: true }));
 App.use(cookieParser());
