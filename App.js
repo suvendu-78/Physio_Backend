@@ -27,12 +27,12 @@
 
 // App.use("/api/v1/pattner", PattnerRouter);
 // export default App;
+
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import Database from "./DataBase/databse.js";
-
 dotenv.config();
 
 const App = express();
@@ -44,24 +44,30 @@ App.use(
   }),
 );
 
-App.use(express.json({ limit: "50mb" }));
-App.use(express.urlencoded({ extended: true }));
-App.use(cookieParser());
-
-// Database connection
 App.use(async (req, res, next) => {
   try {
     await Database();
     next();
   } catch (error) {
-    console.log("DATABASE CONNECTION ERROR:", error);
+    console.log("DATABASE CONNECTION ERROR:", error.message);
 
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Database connection failed",
     });
   }
 });
+
+App.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Physio backend is running",
+  });
+});
+
+App.use(express.json({ limit: "50mb" }));
+App.use(express.urlencoded({ extended: true }));
+App.use(cookieParser());
 
 App.get("/", (req, res) => {
   res.json({

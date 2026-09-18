@@ -12,9 +12,6 @@ import Clinic from "../Const.js";
 //   }
 // };
 // export default Database;
-import mongoose from "mongoose";
-import Clinic from "../Const.js";
-
 const Database = async () => {
   try {
     if (mongoose.connection.readyState === 1) {
@@ -31,5 +28,4 @@ const Database = async () => {
     throw error;
   }
 };
-
 export default Database;
