@@ -1,5 +1,5 @@
-// import mongoose from "mongoose";
-// import Clinic from "../Const.js";
+import mongoose from "mongoose";
+import Clinic from "../Const.js";
 
 // const Database = async () => {
 //   try {
@@ -12,13 +12,9 @@
 //   }
 // };
 // export default Database;
-import mongoose from "mongoose";
-import Clinic from "../Const.js";
-
 const Database = async () => {
   try {
     if (mongoose.connection.readyState === 1) {
-      console.log("MongoDB already connected");
       return mongoose.connection;
     }
 
@@ -32,5 +28,4 @@ const Database = async () => {
     throw error;
   }
 };
-
 export default Database;

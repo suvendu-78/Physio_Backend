@@ -46,18 +46,4 @@ if (!process.env.VERCEL) {
   startServer();
 }
 
-App.use(async (req, res, next) => {
-  try {
-    await Database();
-    next();
-  } catch (error) {
-    console.log("DATABASE CONNECTION ERROR:", error.message);
-
-    return res.status(500).json({
-      success: false,
-      message: "Database connection failed",
-    });
-  }
-});
-
 export default App;
