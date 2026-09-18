@@ -32,7 +32,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import Database from "./DataBase/databse.js";
+// import Database from "./DataBase/databse.js";
 dotenv.config();
 
 const App = express();
@@ -44,19 +44,19 @@ App.use(
   }),
 );
 
-App.use(async (req, res, next) => {
-  try {
-    await Database();
-    next();
-  } catch (error) {
-    console.log("DATABASE CONNECTION ERROR:", error.message);
+// App.use(async (req, res, next) => {
+//   try {
+//     await Database();
+//     next();
+//   } catch (error) {
+//     console.log("DATABASE CONNECTION ERROR:", error.message);
 
-    return res.status(500).json({
-      success: false,
-      message: "Database connection failed",
-    });
-  }
-});
+//     return res.status(500).json({
+//       success: false,
+//       message: "Database connection failed",
+//     });
+//   }
+// });
 
 App.get("/", (req, res) => {
   res.json({
