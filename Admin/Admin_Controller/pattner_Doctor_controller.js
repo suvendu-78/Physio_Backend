@@ -156,16 +156,17 @@ const Doctor_Login = Admin_Async(async (req, res) => {
   // Access Token Cookie
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false, // true in production HTTPS
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 15 * 60 * 1000,
   });
 
-  // Refresh Token Cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false, // true in production HTTPS
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 10 * 24 * 60 * 60 * 1000,
   });
 
