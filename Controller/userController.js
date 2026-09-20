@@ -56,8 +56,8 @@ const Signup = Async(async (req, res, next) => {
 
 const Login = Async(async (req, res) => {
   const { Email, Password } = req.body;
-  console.log(Email);
-  console.log("LOGIN DATA:", req.body);
+
+  console.log("LOGIN EMAIL:", Email);
 
   const user = await User.findOne({ Email });
 
@@ -65,9 +65,8 @@ const Login = Async(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  // IMPORTANT:
-  // You should verify Password here.
-  // Use your existing password comparison method if you have one.
+  // TODO: password verification
+  // Add your password comparison here.
 
   const accessToken = user.generateAccessToken();
   const refreshToken = user.generateRefreshToken();
@@ -76,31 +75,25 @@ const Login = Async(async (req, res) => {
     "-Password -Refresh_Token",
   );
 
-  // Access Token Cookie
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false, // true in production HTTPS
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 15 * 60 * 1000,
   });
 
-  // Refresh Token Cookie
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false, // true in production HTTPS
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 10 * 24 * 60 * 60 * 1000,
   });
 
-  return res.status(200).json(
-    new Apiresponse(
-      200,
-      {
-        logedin,
-      },
-      "User logged in successfully",
-    ),
-  );
+  return res
+    .status(200)
+    .json(new Apiresponse(200, { logedin }, "User logged in successfully"));
 });
 const Booking = Async(async (req, res, next) => {
   const { Type, Date, Time, Fullname, Age, Number, Problem, Address } =
