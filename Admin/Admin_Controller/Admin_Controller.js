@@ -223,23 +223,36 @@ const clinicpendingData = Admin_Async(async (req, res) => {
 });
 
 const VerifyAdminJWT = Admin_Async(async (req, res, next) => {
-  const token = req.cookies?.accessToken;
+  try {
+    const token = req.cookies?.accessToken;
 
-  if (!token) {
-    throw new ApiError(401, "Unauthorized request");
+    console.log("ADMIN ACCESS TOKEN:", token ? "PRESENT" : "MISSING");
+
+    if (!token) {
+      throw new ApiError(401, "Unauthorized - access token missing");
+    }
+
+    console.log(
+      "ACCESS TOKEN SECRET:",
+      process.env.Access_Token ? "PRESENT" : "MISSING",
+    );
+
+    const decodedToken = jwt.verify(token, process.env.Access_Token);
+
+    console.log("DECODED ADMIN TOKEN:", decodedToken);
+
+    req.user = decodedToken;
+
+    next();
+  } catch (error) {
+    console.log("ADMIN JWT ERROR:", error.message);
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid or expired admin access token",
+    });
   }
-
-  const decodedToken = jwt.verify(token, process.env.Access_Token);
-
-  if (!decodedToken) {
-    throw new ApiError(401, "Invalid access token");
-  }
-
-  req.user = decodedToken;
-
-  next();
 });
-
 const FindAdmin = Admin_Async(async (req, res) => {
   const admin = await Admin.findById(req.user.id).select(
     "-Password -Refresh_Token",
