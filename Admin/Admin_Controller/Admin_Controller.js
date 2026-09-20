@@ -91,21 +91,21 @@ const AminLogin = Admin_Async(async (req, res) => {
   const logedin = await Admin.findById(admin.id).select(
     "-Password -Refresh_Token",
   );
-
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 15 * 60 * 1000,
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 10 * 24 * 60 * 60 * 1000,
   });
-
   return res.status(200).json(
     new Apiresponse(
       200,
