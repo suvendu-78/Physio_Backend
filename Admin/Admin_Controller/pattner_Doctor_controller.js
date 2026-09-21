@@ -168,7 +168,7 @@ const Doctor_Login = Admin_Async(async (req, res) => {
     sameSite: "none",
     path: "/",
     maxAge: 10 * 24 * 60 * 60 * 1000,
-  });
+  }); 
 
   return res.status(200).json(
     new Apiresponse(
