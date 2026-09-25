@@ -41,7 +41,7 @@ App.use(
   cors({
     origin: [
       "https://libimotioncarecenter.netlify.app",
-      "http://libimotioncare-onboard.netlify.app",
+      "https://libimotioncare-onboard.netlify.app",
     ],
     credentials: true,
   }),
