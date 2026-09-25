@@ -39,7 +39,10 @@ const App = express();
 
 App.use(
   cors({
-    origin: ["visionary-fudge-568a40.netlify.app", "http://localhost:5174"],
+    origin: [
+      "https://visionary-fudge-568a40.netlify.app",
+      "http://localhost:5174",
+    ],
     credentials: true,
   }),
 );
