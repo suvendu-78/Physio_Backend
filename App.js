@@ -40,7 +40,7 @@ const App = express();
 App.use(
   cors({
     origin: [
-      "https://visionary-fudge-568a40.netlify.app",
+      "https://libimotioncarecenter.netlify.app",
       "http://localhost:5174",
     ],
     credentials: true,
