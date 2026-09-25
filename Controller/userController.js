@@ -229,7 +229,7 @@ const Forgetpassword = Async(async (req, res, next) => {
 
   // console.log("4. Token saved");
 
-  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+  const resetUrl = `https://libimotioncarecenter.netlify.app/reset-password/${resetToken}`;
 
   console.log("5. Reset URL created");
 
