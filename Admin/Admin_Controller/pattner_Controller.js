@@ -121,15 +121,15 @@ const ClinicLogin = Admin_Async(async (req, res) => {
   if (!isPasswordCorrect) {
     throw new ApiError(401, "Invalid password");
   }
-  const accessToken = clinic.PattnergererateAccesstoke();
-  const refreshToken = clinic.PattnergenerateRefreshtoken();
+  const ClinicaccessToken = clinic.PattnergererateAccesstoke();
+  const ClinicrefreshToken = clinic.PattnergenerateRefreshtoken();
 
   const logedin = await Pattner_clinic.findById(clinic.id).select(
     "-Password -Refresh_Token",
   );
 
   // Access Token Cookie
-  res.cookie("accessToken", accessToken, {
+  res.cookie("ClinicaccessToken", ClinicaccessToken, {
     httpOnly: true,
     secure: false, // true in production HTTPS
     sameSite: "lax",
@@ -137,7 +137,7 @@ const ClinicLogin = Admin_Async(async (req, res) => {
   });
 
   // Refresh Token Cookie
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie("ClinicrefreshToken", ClinicrefreshToken, {
     httpOnly: true,
     secure: false, // true in production HTTPS
     sameSite: "lax",
@@ -223,7 +223,7 @@ const Clinic_Forgetpassword = Admin_Async(async (req, res, next) => {
 const verifyJWTClinic = Admin_Async(async (req, res, next) => {
   try {
     const token =
-      req.cookies?.accessToken ||
+      req.cookies?.ClinicaccessToken ||
       req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
@@ -269,13 +269,13 @@ const getClinic = Admin_Async(async (req, res) => {
     .json(new Apiresponse(200, clinic, "Clinic fetched successfully"));
 });
 const ClinicLogout = Admin_Async(async (req, res) => {
-  res.clearCookie("accessToken", {
+  res.clearCookie("ClinicaccessToken", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
   });
 
-  res.clearCookie("refreshToken", {
+  res.clearCookie("ClinicrefreshToken", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",

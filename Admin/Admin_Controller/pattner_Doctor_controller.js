@@ -146,15 +146,15 @@ const Doctor_Login = Admin_Async(async (req, res) => {
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid email or password");
   }
-  const accessToken = doctor.PattnergererateAccesstoke();
-  const refreshToken = doctor.PattnergenerateRefreshtoken();
+  const DoctoraccessToken = doctor.PattnergererateAccesstoke();
+  const DoctorrefreshToken = doctor.PattnergenerateRefreshtoken();
 
   const logedin = await Pattner.findById(doctor.id).select(
     "-Password -Refresh_Token",
   );
 
   // Access Token Cookie
-  res.cookie("accessToken", accessToken, {
+  res.cookie("DoctoraccessToken", DoctoraccessToken, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
@@ -162,13 +162,13 @@ const Doctor_Login = Admin_Async(async (req, res) => {
     maxAge: 15 * 60 * 1000,
   });
 
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie("DoctorrefreshToken", DoctorrefreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
     path: "/",
     maxAge: 10 * 24 * 60 * 60 * 1000,
-  }); 
+  });
 
   return res.status(200).json(
     new Apiresponse(
@@ -247,7 +247,7 @@ const Pattner_Forgetpassword = Admin_Async(async (req, res, next) => {
 });
 
 const VerifyDoctorJWT = Admin_Async(async (req, res, next) => {
-  const token = req.cookies?.accessToken;
+  const token = req.cookies?.DoctoraccessToken;
 
   if (!token) {
     throw new ApiError(401, "Unauthorized request");
@@ -284,13 +284,13 @@ const findDoctor = Admin_Async(async (req, res) => {
   );
 });
 const DoctorLogout = Admin_Async(async (req, res) => {
-  res.clearCookie("accessToken", {
+  res.clearCookie("DoctoraccessToken", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
   });
 
-  res.clearCookie("refreshToken", {
+  res.clearCookie("DoctorrefreshToken", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",

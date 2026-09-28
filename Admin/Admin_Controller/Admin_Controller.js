@@ -85,13 +85,13 @@ const AminLogin = Admin_Async(async (req, res) => {
     throw new ApiError(401, "Invalid password");
   }
 
-  const accessToken = admin.generateAccessToken_admin();
-  const refreshToken = admin.generateRefreshToken_admin();
+  const AdminaccessToken = admin.generateAccessToken_admin();
+  const AdminrefreshToken = admin.generateRefreshToken_admin();
 
   const logedin = await Admin.findById(admin.id).select(
     "-Password -Refresh_Token",
   );
-  res.cookie("accessToken", accessToken, {
+  res.cookie("AdminaccessToken", AdminaccessToken, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
@@ -99,7 +99,7 @@ const AminLogin = Admin_Async(async (req, res) => {
     maxAge: 15 * 60 * 1000,
   });
 
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie("AdminrefreshToken", AdminrefreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
@@ -224,7 +224,7 @@ const clinicpendingData = Admin_Async(async (req, res) => {
 
 const VerifyAdminJWT = Admin_Async(async (req, res, next) => {
   try {
-    const token = req.cookies?.accessToken;
+    const token = req.cookies?.AdminaccessToken;
 
     console.log("ADMIN ACCESS TOKEN:", token ? "PRESENT" : "MISSING");
 
@@ -273,13 +273,13 @@ const FindAdmin = Admin_Async(async (req, res) => {
   );
 });
 const AdminLogout = Admin_Async(async (req, res) => {
-  res.clearCookie("accessToken", {
+  res.clearCookie("AdminaccessToken", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
   });
 
-  res.clearCookie("refreshToken", {
+  res.clearCookie("AdminrefreshToken", {
     httpOnly: true,
     secure: false,
     sameSite: "lax",
