@@ -212,7 +212,7 @@ const Pattner_Forgetpassword = Admin_Async(async (req, res, next) => {
 
   // console.log("4. Token saved");
 
-  const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+  const resetUrl = `https://localhost:5173/reset-password/${resetToken}`;
 
   console.log("5. Reset URL created");
 
@@ -286,14 +286,16 @@ const findDoctor = Admin_Async(async (req, res) => {
 const DoctorLogout = Admin_Async(async (req, res) => {
   res.clearCookie("DoctoraccessToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
 
   res.clearCookie("DoctorrefreshToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
 
   return res.status(200).json({
