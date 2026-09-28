@@ -131,16 +131,17 @@ const ClinicLogin = Admin_Async(async (req, res) => {
   // Access Token Cookie
   res.cookie("ClinicaccessToken", ClinicaccessToken, {
     httpOnly: true,
-    secure: false, // true in production HTTPS
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 15 * 60 * 1000,
   });
 
-  // Refresh Token Cookie
   res.cookie("ClinicrefreshToken", ClinicrefreshToken, {
     httpOnly: true,
-    secure: false, // true in production HTTPS
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
     maxAge: 10 * 24 * 60 * 60 * 1000,
   });
 
@@ -271,14 +272,16 @@ const getClinic = Admin_Async(async (req, res) => {
 const ClinicLogout = Admin_Async(async (req, res) => {
   res.clearCookie("ClinicaccessToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
 
   res.clearCookie("ClinicrefreshToken", {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
   });
 
   return res.status(200).json({
