@@ -273,16 +273,20 @@ const FindAdmin = Admin_Async(async (req, res) => {
   );
 });
 const AdminLogout = Admin_Async(async (req, res) => {
-  res.clearCookie("AdminaccessToken", {
+  res.cookie("AdminaccessToken", AdminaccessToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 15 * 60 * 1000,
   });
 
-  res.clearCookie("AdminrefreshToken", {
+  res.cookie("AdminrefreshToken", AdminrefreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "lax",
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    maxAge: 10 * 24 * 60 * 60 * 1000,
   });
 
   return res.status(200).json({
